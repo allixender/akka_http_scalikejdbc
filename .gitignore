@@ -1,0 +1,43 @@
+##intellij
+/.idea
+/.idea_modules
+*.iml
+*.eml
+*.class
+target/
+
+##playframework as recommended by https://www.playframework.com/documentation/2.5.x/Anatomy#Typical-.gitignore-file
+bin/
+/db
+/lib/
+logs
+/modules
+project/project
+project/target
+target
+tmp
+dist
+test-result
+server.pid
+*.eml
+.cache
+/RUNNING_PID
+
+##eclipse items
+/.eclipse
+/.classpath
+/.project
+/.settings
+/.history
+
+##other IDEs, activator ui, misc.
+.sbtserver/
+project/.sbtserver*
+/project/sbt-ui.sbt
+
+## generated files for sbt-site
+src/site/generated/*
+/cookie-jar.txt
+client_secret.json
+/conf/application.local.conf
+/conf/logback-stdout-local.xml
