@@ -8,8 +8,9 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import scalikejdbc.config._
 
-import scala.io.StdIn
-import scala.util.Try
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+import scala.util.{ Failure, Success, Try }
 
 //#main-class
 object QuickstartServer extends App with TheRoutes {
@@ -47,12 +48,18 @@ object QuickstartServer extends App with TheRoutes {
 
   val bindingFuture = Http().bindAndHandle(routes, config.getString("http.ip"), config.getInt("http.port"))
 
-  logger.info(s"Server online at ${config.getString("http.ip")}, ${config.getInt("http.port")} \nPress RETURN to stop...")
+  // logger.info(s"Server online at ${config.getString("http.ip")}, ${config.getInt("http.port")} \nPress RETURN to stop...")
 
-  StdIn.readLine() // let it run until user presses return
-  bindingFuture
-    .flatMap(_.unbind()) // trigger unbinding from the port
-    .onComplete(_ ⇒ system.terminate()) // and shutdown when done
+  //#http-server
+
+  bindingFuture.onComplete {
+    case Success(bound) =>
+      logger.info(s"Server online at ${config.getString("http.ip")}, ${config.getInt("http.port")}")
+    case Failure(e) =>
+      logger.error(s"Server could not start!")
+      e.printStackTrace()
+      system.terminate()
+  }
+
+  Await.result(system.whenTerminated, Duration.Inf)
 }
-
-//#main-class

@@ -49,4 +49,5 @@ lazy val root = (project in file(".")).
   ).
   settings(inThisBuild(
     assemblyJarName in assembly := "akka-fluxdata.jar"
-  ))
+  )).
+  enablePlugins(JavaAppPackaging)
