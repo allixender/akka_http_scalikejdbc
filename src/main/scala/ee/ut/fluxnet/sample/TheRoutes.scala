@@ -46,8 +46,12 @@ trait TheRoutes {
   }
 
   private def getDefaultPage(workingDirectory: String) = {
+    getSensorPage(workingDirectory, "index.html")
+  }
+
+  private def getSensorPage(workingDirectory: String, pageName: String) = {
     val basePath = new java.io.File(workingDirectory)
-    val indexPath = new File(basePath, "index.html")
+    val indexPath = new File(basePath, pageName)
     val fullPath = List(Paths.get(indexPath.getPath))
     val res = fullPath.filter(x => Files.exists(x))
     if (res.nonEmpty)
@@ -63,19 +67,16 @@ trait TheRoutes {
     pathPrefix("sensors1") {
       concat(
         //#users-get-delete
-        pathEnd {
+        pathEndOrSingleSlash {
           concat(
             //# get index html
             get {
               entity(as[HttpRequest]) { requestData =>
                 complete {
-                  log.info(s"path match: ${requestData.uri.path.toString()}")
-                  val fullPath = requestData.uri.path.toString match {
-                    case "/sensors1/" => getDefaultPage(workingDirectory)
-                    case "/sensors1" => getDefaultPage(workingDirectory)
-                    case _ => Paths.get(workingDirectory + requestData.uri.path.toString)
-                  }
 
+                  log.info(s"sensor path match: ${requestData.uri.path.toString()}")
+
+                  val fullPath = getDefaultPage(workingDirectory)
                   val ext = getExtensions(fullPath.getFileName.toString)
                   val m: MediaType = MediaTypes.forExtension(ext)
                   val c: ContentType = m match {
@@ -116,6 +117,35 @@ trait TheRoutes {
                   complete((StatusCodes.OK, performed))
                 }
                 //# capabitltiites
+              }
+            )
+          } ~ path(Remaining) { _ =>
+            concat(
+              //# get index html
+              get {
+                entity(as[HttpRequest]) { requestData =>
+                  complete {
+                    val Pattern = "/sensors1/([a-zA-Z]+).html".r
+
+                    log.info(s"path remaining match: ${requestData.uri.path.toString()}")
+
+                    val fullPath = requestData.uri.path.toString() match {
+                      case Pattern(page) => getSensorPage(workingDirectory, page + ".html")
+                      case _ => getDefaultPage(workingDirectory)
+                    }
+                    val ext = getExtensions(fullPath.getFileName.toString)
+                    val m: MediaType = MediaTypes.forExtension(ext)
+                    val c: ContentType = m match {
+                      case mt if mt.isText && mt.subType == "html" => ContentTypes.`text/html(UTF-8)`
+                      case mt if mt.isText => ContentTypes.`text/plain(UTF-8)`
+                      case mt if mt.isApplication && mt.subType == "json" => ContentTypes.`application/json`
+                      case _ => ContentTypes.`application/octet-stream`
+                    }
+
+                    val byteArray = Files.readAllBytes(fullPath)
+                    HttpResponse(StatusCodes.OK, entity = HttpEntity(c, byteArray))
+                  }
+                }
               }
             )
           }

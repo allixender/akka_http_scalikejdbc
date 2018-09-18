@@ -113,28 +113,20 @@
         const fluxdataurl = '/sensors1/data';
 
         const parametersconf = {
-            "Soontaga_LFdata": {
-                "fields": [
+            "Tenso_TensoLFdata": {
+                "fields": ["batt_volt_Min",
+                    "batt_volt_Avg",
+                    "PTemp_Avg",
                     "P_air_Avg",
                     "Rain_mm_Tot",
                     "PAR_reflected_Den_umol_Avg",
                     "PAR_reflected_Tot_Tot",
                     "PAR_incoming_Den_umol_Avg",
                     "PAR_incoming_Tot_Tot",
-                    "Albedo_Net_Avg",
-                    "Rnet_Net_Avg",
-                    "RIL_Net_Avg",
-                    "ROL_Net_Avg",
-                    "RLnet_Net_Avg",
-                    "RIS_Net_Avg",
-                    "ROS_Net_Avg",
-                    "RSnet_Net_Avg",
                     "RIS_Pyr_Avg",
                     "ROT_AirTC_Avg",
-                    "ROT_RH_Avg",
-                    "batt_volt_Min",
-                    "batt_volt_Avg",
-                    "PTemp_Avg"]
+                    "ROT_RH_Avg"
+                ]
             }
         };
 
@@ -150,9 +142,9 @@
         // draws it.
         function drawCharts() {
 
-            parametersconf.Soontaga_LFdata.fields.forEach(function (item, index) {
+            parametersconf.Tenso_TensoLFdata.fields.forEach(function (item, index) {
                 // console.log(item + " - " + index)
-                const stationFixed = "Soontaga_LFdata";
+                const stationFixed = "Tenso_TensoLFdata";
                 const paramForEach = item;
 
                 const fluxdatarequestForEach = {
@@ -228,12 +220,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Sensor Stations</a>
+                <a class="navbar-brand" href="/sensors1/index.html">Sensor Stations</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Soontaga LF</a></li>
-                    <li class="active"><a href="/sensors1/tenso.html">Tenso LF</a></li>
+                    <li class="active"><a href="/sensors1/index.html">Soontaga LF</a></li>
+                    <li class="active"><a href="#">Tenso LF</a></li>
                     <li class="active"><a href="/sensors1/konnu.html">Kõnnu LF</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
@@ -250,7 +242,7 @@
 
         <div role="main" class="col-lg-9 col-md-10 col-sm-12 starter-template">
             <p>Loading latest 48h data from LoggerNet database.<br>
-                This is (half-)hourly averaged at Soontaga. This page reloads itself every 60 seconds.</p>
+                This is (half-)hourly averaged at Tenso. This page reloads itself every 60 seconds.</p>
             <div id="chart_div_PTemp_Avg"></div>
             <div id="chart_div_P_air_Avg"></div>
             <div id="chart_div_Rain_mm_Tot"></div>
@@ -258,14 +250,6 @@
             <div id="chart_div_PAR_reflected_Tot_Tot"></div>
             <div id="chart_div_PAR_incoming_Den_umol_Avg"></div>
             <div id="chart_div_PAR_incoming_Tot_Tot"></div>
-            <div id="chart_div_Albedo_Net_Avg"></div>
-            <div id="chart_div_Rnet_Net_Avg"></div>
-            <div id="chart_div_RIL_Net_Avg"></div>
-            <div id="chart_div_ROL_Net_Avg"></div>
-            <div id="chart_div_RLnet_Net_Avg"></div>
-            <div id="chart_div_RIS_Net_Avg"></div>
-            <div id="chart_div_ROS_Net_Avg"></div>
-            <div id="chart_div_RSnet_Net_Avg"></div>
             <div id="chart_div_RIS_Pyr_Avg"></div>
             <div id="chart_div_ROT_AirTC_Avg"></div>
             <div id="chart_div_ROT_RH_Avg"></div>
@@ -293,8 +277,8 @@
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    L.marker([58.00954, 26.0866693]).addTo(map)
-        .bindPopup('Soontaga sensor station.')
+    L.marker([58.264621, 26.917962]).addTo(map)
+        .bindPopup('Tenso bus station.')
         .openPopup();
 
     var recentreControl = L.Control.extend({
