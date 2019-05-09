@@ -35,9 +35,25 @@ server.pid
 project/.sbtserver*
 /project/sbt-ui.sbt
 
+.bloop
+.metals
+
 ## generated files for sbt-site
 src/site/generated/*
 /cookie-jar.txt
 client_secret.json
 /conf/application.local.conf
 /conf/logback-stdout-local.xml
+
+# Files and directories created by pub
+.dart_tool/
+.packages
+
+# Remove the following pattern if you wish to check in your lock file
+pubspec.lock
+
+# Conventional directory for build outputs
+build/
+
+# Directory created by dartdoc
+doc/api/

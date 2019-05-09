@@ -1,5 +1,5 @@
 lazy val akkaVersion    = "2.5.8"
-lazy val akkaHttpVersion = "10.1.0-RC1"
+lazy val akkaHttpVersion = "10.1.0"
 
 lazy val root = (project in file(".")).
   settings(
@@ -10,6 +10,7 @@ lazy val root = (project in file(".")).
     name := "Akka Http Fluxnet",
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http"            % akkaHttpVersion,
+      "ch.megard"         %% "akka-http-cors"       % "0.3.0",
       "com.typesafe.akka" %% "akka-stream"          % akkaVersion,
 
       "de.heikoseeberger" %% "akka-http-play-json"      % "1.20.0-RC1",

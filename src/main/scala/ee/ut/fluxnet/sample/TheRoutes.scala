@@ -18,6 +18,8 @@ import ee.ut.fluxnet.sample.FluxdataBabylonActor._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+
 //#user-routes-class
 trait TheRoutes {
   //#user-routes-class
@@ -60,6 +62,8 @@ trait TheRoutes {
       Paths.get("")
   }
 
+  // Your rejection handler: corsRejectionHandler
+
   //#all-routes
   //#users-get-post
   //#users-get-delete   
@@ -95,30 +99,36 @@ trait TheRoutes {
         } ~
           //# query-post
           //# capababilities-get
-          path("data") {
-            concat(
-              post {
-                //# query db
-                entity(as[RequestFluxataSeries]) { datarequest =>
-                  val maybeResult: Future[Option[DataSeries]] =
-                    (fluxdataDbActor ? datarequest).mapTo[Option[DataSeries]]
-                  rejectEmptyResponse {
-                    complete(maybeResult)
+          cors() {
+            path("data") {
+
+              concat(
+                options {
+                  complete(HttpResponse(StatusCodes.OK))
+                },
+                post {
+                  //# query db
+                  entity(as[RequestFluxataSeries]) { datarequest =>
+                    val maybeResult: Future[Option[DataSeries]] =
+                      (fluxdataDbActor ? datarequest).mapTo[Option[DataSeries]]
+                    rejectEmptyResponse {
+                      complete(maybeResult)
+                    }
                   }
+                  //# query db
+                },
+                get {
+                  //# capabiltiites
+                  val dataCapa: Future[DataCapabilities] =
+                    (fluxdataDbActor ? RequestFluxataCapabilities).mapTo[DataCapabilities]
+                  onSuccess(dataCapa) { performed =>
+                    log.info("found stations user [{}]: {}", performed.stations.length, performed.stations)
+                    complete((StatusCodes.OK, performed))
+                  }
+                  //# capabitltiites
                 }
-                //# query db
-              },
-              get {
-                //# capabiltiites
-                val dataCapa: Future[DataCapabilities] =
-                  (fluxdataDbActor ? RequestFluxataCapabilities).mapTo[DataCapabilities]
-                onSuccess(dataCapa) { performed =>
-                  log.info("found stations user [{}]: {}", performed.stations.length, performed.stations)
-                  complete((StatusCodes.OK, performed))
-                }
-                //# capabitltiites
-              }
-            )
+              )
+            }
           } ~ path(Remaining) { _ =>
             concat(
               //# get index html
