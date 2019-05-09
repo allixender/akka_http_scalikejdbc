@@ -1,16 +1,34 @@
 import 'dart:html';
 import 'package:js/js.dart';
 import 'dart:convert';
-import 'package:chartjs/chartjs.dart';
+import 'package:service_worker/window.dart' as sw;
 
+import 'package:chartjs/chartjs.dart';
 import 'types.d/leaflet_interop.dart' as L;
 import 'types.d/module.dart';
 
 Future main() async {
+  // service worker stuff test
+  if (sw.isNotSupported) {
+    print('ServiceWorkers are not supported.');
+    return;
+  }
+
+  await sw.register('sw.dart.js');
+  print('registered');
+
+  sw.ServiceWorkerRegistration registration = await sw.ready;
+  print('ready');
+
+  sw.onMessage.listen((MessageEvent event) {
+    print('reply received: ${event.data}');
+  });
+
   // the map
   var home = MapHome(58.00954, 26.0866693, 6);
 
-  var map = L.Map('map')..setView([home.lat, home.lng], home.zoom);
+  var map = L.Map('map');
+  map.setView([home.lat, home.lng], home.zoom);
 
   L.TileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png')
     ..options.attribution =
@@ -77,6 +95,11 @@ Future main() async {
       "from": before_dart_utc.toIso8601String(),
       "to": now_dart_utc.toIso8601String()
     });
+
+    var message = fluxdatarequestForEach.toString();
+    print('Sending message: `$message`');
+    registration.active.postMessage(message);
+    print('Message sent: `$message`');
 
     var request = HttpRequest();
     request
@@ -151,6 +174,15 @@ Future main() async {
       // google.charts.setOnLoadCallback(drawCharts);
 
     }
+  }
+
+  try {
+    var subs = await registration.pushManager
+        .subscribe(new sw.PushSubscriptionOptions(userVisibleOnly: true));
+    print('endpoint: ${subs.endpoint}');
+  } on DomException catch (_) {
+    print('Error: Adding push subscription failed.');
+    print('       See github.com/isoos/service_worker/issues/10');
   }
 }
 
